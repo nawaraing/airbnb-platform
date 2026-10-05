@@ -1,5 +1,6 @@
 import "server-only";
 import { computeDashboardKpis, todayIn, yearMonthOf } from "@repo/core";
+import { requireViewer } from "@/lib/auth/dal";
 import { DEFAULT_TIMEZONE } from "@/lib/config";
 import { buildMockDataset, MOCK_UNITS } from "@/lib/mock/dataset";
 import { lastminuteStateAt, minutesOfDay, seedActivity } from "@/lib/mock/operations";
@@ -11,6 +12,7 @@ import type { DashboardData, LastminuteSummary } from "./types";
  * 연동 후에는 같은 반환 형태를 유지한 채 Supabase 조회(docs/08-data-model.md §12)로 바꾼다.
  */
 export async function getDashboard(query: DashboardQuery, now: Date = new Date()): Promise<DashboardData> {
+  const viewer = await requireViewer();
   const today = todayIn(DEFAULT_TIMEZONE, now);
   const month = yearMonthOf(today);
   const dataset = buildMockDataset(today);
@@ -68,7 +70,7 @@ export async function getDashboard(query: DashboardQuery, now: Date = new Date()
       perUnit,
     },
     integrations: {
-      account: { name: "데모 호스트", plan: "베타" },
+      account: { name: viewer.username, plan: "베타" },
       airbnb: { status: "active" },
       alimtalk: { configured: false },
     },

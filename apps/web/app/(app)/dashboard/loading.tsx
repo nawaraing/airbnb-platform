@@ -4,7 +4,7 @@ export default function DashboardLoading() {
   return (
     <div aria-busy="true" aria-label="대시보드 불러오는 중">
       <div className="border-b bg-card">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:h-[76px] md:px-8 md:py-0">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:h-19 md:px-8 md:py-0">
           <div className="space-y-2">
             <Skeleton className="h-7 w-28" />
             <Skeleton className="h-4 w-40" />
