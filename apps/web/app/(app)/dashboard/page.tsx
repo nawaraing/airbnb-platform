@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/app-shell/page-header";
+import { MAIN_CONTENT_ID } from "@/components/app-shell/skip-link";
 import { ActivityPanel } from "@/components/dashboard/activity-panel";
 import { AutomationPausedBanner } from "@/components/dashboard/automation-paused-banner";
 import { DashboardLiveProvider, PendingRegion } from "@/components/dashboard/dashboard-live";
@@ -30,21 +31,23 @@ export default async function DashboardPage(props: PageProps<"/dashboard">) {
         actions={<SyncControl />}
       />
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 md:px-8 md:py-8">
+      <main id={MAIN_CONTENT_ID} className="mx-auto max-w-7xl space-y-8 px-4 py-6 md:px-8 md:py-8">
         {data.automation.paused && <AutomationPausedBanner />}
 
-        <DashboardToolbar
-          query={{ basis: data.basis, unitId: data.unitId }}
-          units={data.units}
-          monthLabel={formatYearMonth(data.month)}
-          source={data.source}
-        />
+        <div className="space-y-5">
+          <DashboardToolbar
+            query={{ basis: data.basis, unitId: data.unitId }}
+            units={data.units}
+            monthLabel={formatYearMonth(data.month)}
+            source={data.source}
+          />
 
-        <PendingRegion>
-          <KpiGrid data={data} />
-        </PendingRegion>
+          <PendingRegion>
+            <KpiGrid data={data} />
+          </PendingRegion>
+        </div>
 
-        <div className="grid gap-4 lg:grid-cols-5">
+        <div className="grid gap-5 lg:grid-cols-5">
           <ActivityPanel className="lg:col-span-3" />
           <IntegrationPanel
             className="lg:col-span-2"

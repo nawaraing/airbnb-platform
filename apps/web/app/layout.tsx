@@ -23,7 +23,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f8fb",
+  // globals.css --background와 같은 색
+  themeColor: "#f9f6f0",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

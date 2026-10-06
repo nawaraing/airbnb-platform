@@ -1,64 +1,51 @@
-import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { formatNumber, formatPercentPointDelta, formatSignedKRW } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const TONES = {
-  indigo: "bg-indigo-50 text-indigo-600 ring-indigo-100",
-  amber: "bg-amber-50 text-amber-600 ring-amber-100",
-  emerald: "bg-emerald-50 text-emerald-600 ring-emerald-100",
-  sky: "bg-sky-50 text-sky-600 ring-sky-100",
-  violet: "bg-violet-50 text-violet-600 ring-violet-100",
-  teal: "bg-teal-50 text-teal-600 ring-teal-100",
-  rose: "bg-rose-50 text-rose-600 ring-rose-100",
-  orange: "bg-orange-50 text-orange-600 ring-orange-100",
-} as const;
-
-export type Tone = keyof typeof TONES;
-
-export function IconTile({ icon: Icon, tone }: { icon: LucideIcon; tone: Tone }) {
+/** 지표 묶음. 칸 사이를 1px 선으로 나눈 장부형 격자 */
+export function KpiSection({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset", TONES[tone])}>
-      <Icon className="size-[18px]" aria-hidden />
-    </span>
+    <section aria-labelledby={id}>
+      <h3 id={id} className="mb-2.5 text-[13px] font-semibold tracking-wide text-muted-foreground">
+        {title}
+      </h3>
+      <div className="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 xl:grid-cols-4">{children}</div>
+    </section>
   );
 }
 
 export function KpiCard({
-  icon,
-  tone,
   label,
   children,
   footer,
   className,
 }: {
-  icon: LucideIcon;
-  tone: Tone;
   label: string;
   children: ReactNode;
   footer?: ReactNode;
   className?: string;
 }) {
   return (
-    <article className={cn("flex flex-col rounded-2xl border bg-card p-5 shadow-xs sm:p-6", className)}>
-      <header className="flex items-center gap-2.5">
-        <IconTile icon={icon} tone={tone} />
-        <h3 className="text-[15px] font-medium text-muted-foreground">{label}</h3>
-      </header>
-      <div className="mt-4">{children}</div>
-      {footer && <div className="mt-auto space-y-0.5 pt-2 text-sm text-muted-foreground">{footer}</div>}
+    <article className={cn("@container flex min-w-0 flex-col bg-card p-5 sm:p-6", className)}>
+      <h4 className="text-sm font-medium text-muted-foreground">{label}</h4>
+      <div className="mt-2.5">{children}</div>
+      {footer && <div className="mt-auto space-y-0.5 pt-4 text-[13px] leading-5 text-muted-foreground">{footer}</div>}
     </article>
   );
 }
 
-const VALUE_SIZE = { lg: "text-[32px] leading-10", md: "text-2xl leading-8" } as const;
+// 칸이 좁으면(1280px 4열 등) 8자리 금액이 넘치지 않도록 칸 너비 기준으로 글자 크기를 줄인다
+const VALUE_SIZE = {
+  lg: "text-[28px] leading-9 @min-[13rem]:text-[34px] @min-[13rem]:leading-10",
+  md: "text-2xl leading-8 @min-[13rem]:text-[26px]",
+} as const;
 
-/** 큰 금액: 작은 ₩ + 굵은 숫자 */
+/** 큰 금액: 작은 ₩ + 숫자 */
 export function Amount({ value, size = "lg" }: { value: number; size?: keyof typeof VALUE_SIZE }) {
   return (
-    <p className={cn("flex items-baseline font-bold tracking-tight tabular-nums", VALUE_SIZE[size])}>
+    <p className={cn("flex items-baseline font-semibold tracking-tight tabular-nums", VALUE_SIZE[size])}>
       {value < 0 && <span>−</span>}
-      <span className="mr-0.5 text-[0.62em] font-semibold text-muted-foreground">₩</span>
+      <span className="mr-0.5 text-[0.55em] font-medium text-muted-foreground">₩</span>
       {formatNumber(Math.abs(value))}
     </p>
   );
@@ -67,9 +54,9 @@ export function Amount({ value, size = "lg" }: { value: number; size?: keyof typ
 /** 큰 숫자 + 단위 */
 export function Figure({ children, unit, size = "lg" }: { children: ReactNode; unit?: string; size?: keyof typeof VALUE_SIZE }) {
   return (
-    <p className={cn("flex items-baseline gap-1 font-bold tracking-tight tabular-nums", VALUE_SIZE[size])}>
+    <p className={cn("flex flex-wrap items-baseline gap-x-1 font-semibold tracking-tight tabular-nums", VALUE_SIZE[size])}>
       {children}
-      {unit && <span className="text-base font-semibold text-muted-foreground">{unit}</span>}
+      {unit && <span className="text-base font-medium text-muted-foreground">{unit}</span>}
     </p>
   );
 }
@@ -84,11 +71,11 @@ export function Delta({ diff, kind }: { diff: number | null; kind: "percentPoint
       전월 대비{" "}
       <span
         className={cn(
-          "font-semibold tabular-nums",
-          flat ? "text-muted-foreground" : diff > 0 ? "text-emerald-600" : "text-rose-600",
+          "font-semibold whitespace-nowrap tabular-nums",
+          flat ? "text-muted-foreground" : diff > 0 ? "text-success" : "text-danger",
         )}
       >
-        {flat ? "" : diff > 0 ? "▲ " : "▼ "}
+        {!flat && <span aria-hidden>{diff > 0 ? "↑ " : "↓ "}</span>}
         {text}
       </span>
     </span>

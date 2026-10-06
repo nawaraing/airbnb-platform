@@ -1,20 +1,26 @@
 "use client";
 
-import { ListChecks } from "lucide-react";
 import type { ConnectionStatus, DashboardData } from "@/lib/dashboard/types";
 import { formatRelative } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useDashboardLive } from "./dashboard-live";
-import { IconTile } from "./kpi-card";
 
 type StatusTone = "success" | "warning" | "danger" | "info" | "neutral";
 
-const PILL: Record<StatusTone, string> = {
-  success: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-  warning: "bg-amber-50 text-amber-700 ring-amber-200",
-  danger: "bg-rose-50 text-rose-700 ring-rose-200",
-  info: "bg-accent text-accent-foreground ring-primary/15",
-  neutral: "bg-muted text-muted-foreground ring-border",
+const STATUS_TEXT: Record<StatusTone, string> = {
+  success: "text-success",
+  warning: "text-warning",
+  danger: "text-danger",
+  info: "text-info",
+  neutral: "text-muted-foreground",
+};
+
+const STATUS_DOT: Record<StatusTone, string> = {
+  success: "bg-success",
+  warning: "bg-warning",
+  danger: "bg-danger",
+  info: "bg-info motion-safe:animate-pulse",
+  neutral: "bg-muted-foreground/50",
 };
 
 const AIRBNB_STATUS: Record<ConnectionStatus, { label: string; tone: StatusTone }> = {
@@ -28,12 +34,15 @@ const AIRBNB_STATUS: Record<ConnectionStatus, { label: string; tone: StatusTone 
 
 function StatusRow({ title, description, status, tone }: { title: string; description: string; status: string; tone: StatusTone }) {
   return (
-    <li className="flex items-center justify-between gap-3 rounded-xl border bg-muted/40 px-4 py-3.5">
+    <li className="flex items-center justify-between gap-4 px-5 py-4">
       <div className="min-w-0">
-        <p className="text-[15px] font-semibold">{title}</p>
-        <p className="truncate text-sm text-muted-foreground">{description}</p>
+        <p className="text-[15px] font-medium">{title}</p>
+        <p className="truncate text-[13px] text-muted-foreground">{description}</p>
       </div>
-      <span className={cn("shrink-0 rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset", PILL[tone])}>{status}</span>
+      <span className={cn("inline-flex shrink-0 items-center gap-2 text-[13px] font-semibold", STATUS_TEXT[tone])}>
+        <span className={cn("size-2 rounded-full", STATUS_DOT[tone])} aria-hidden />
+        {status}
+      </span>
     </li>
   );
 }
@@ -51,14 +60,13 @@ export function IntegrationPanel({
   const airbnb = AIRBNB_STATUS[integrations.airbnb.status];
 
   return (
-    <section aria-labelledby="integration-title" className={cn("rounded-2xl border bg-card p-5 shadow-xs sm:p-6", className)}>
-      <div className="flex items-center gap-2.5">
-        <IconTile icon={ListChecks} tone="indigo" />
-        <h2 id="integration-title" className="text-lg font-semibold">
+    <section aria-labelledby="integration-title" className={cn("flex flex-col rounded-lg border bg-card", className)}>
+      <div className="border-b px-5 py-3.5">
+        <h2 id="integration-title" className="text-[15px] font-semibold">
           연동 상태
         </h2>
       </div>
-      <ul className="mt-4 space-y-2.5">
+      <ul className="divide-y">
         <StatusRow
           title="계정"
           description={`${integrations.account.name}님 · ${integrations.account.plan} 플랜`}

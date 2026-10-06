@@ -1,18 +1,8 @@
 import { diffDays } from "@repo/core";
-import {
-  BedDouble,
-  CalendarDays,
-  Gauge,
-  MessageSquareText,
-  Sparkles,
-  TrendingUp,
-  Wallet,
-  Zap,
-} from "lucide-react";
 import type { DashboardData, LastminuteState } from "@/lib/dashboard/types";
 import { formatKRW, formatMonthDay, formatPercent, formatWeekday } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { Amount, Delta, Figure, KpiCard } from "./kpi-card";
+import { Amount, Delta, Figure, KpiCard, KpiSection } from "./kpi-card";
 
 const diffOrNull = (a: number | null, b: number | null) => (a === null || b === null ? null : a - b);
 
@@ -50,28 +40,16 @@ export function KpiGrid({ data }: { data: DashboardData }) {
 
   return (
     <>
-      <section aria-label="이번 달 실적" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard
-          icon={CalendarDays}
-          tone="indigo"
-          label="이번 달 예약"
-          footer={`${isPayout ? "정산일" : "숙박일"} 기준 · 지난달 ${previous.bookings}건`}
-        >
+      <KpiSection id="kpi-results" title="실적">
+        <KpiCard label="이번 달 예약" footer={`${isPayout ? "정산일" : "숙박일"} 기준 · 지난달 ${previous.bookings}건`}>
           <Figure unit="건">{current.bookings}</Figure>
         </KpiCard>
 
-        <KpiCard
-          icon={Wallet}
-          tone="amber"
-          label="이번 달 매출"
-          footer={isPayout ? "정산일 기준 · 실제 정산액" : "숙박일 기준 · 박 단위 안분"}
-        >
+        <KpiCard label="이번 달 매출" footer={isPayout ? "정산일 기준 · 실제 정산액" : "숙박일 기준 · 박 단위 안분"}>
           <Amount value={current.revenue} />
         </KpiCard>
 
         <KpiCard
-          icon={TrendingUp}
-          tone="emerald"
           label="이번 달 순수익"
           footer={
             <>
@@ -87,31 +65,25 @@ export function KpiGrid({ data }: { data: DashboardData }) {
         </KpiCard>
 
         <KpiCard
-          icon={Sparkles}
-          tone="sky"
           label="다음 청소"
           footer={nextCleaning ? `${nextCleaning.count}건 청소 필요` : "다음 체크아웃이 생기면 표시돼요"}
         >
           {nextCleaning ? (
             <Figure>
               {formatMonthDay(nextCleaning.date)}
-              <span className="text-base font-semibold text-muted-foreground">
-                ({formatWeekday(nextCleaning.date)})
-              </span>
-              <span className="ml-1 self-center rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700 ring-1 ring-sky-100 ring-inset">
+              <span className="text-base font-medium text-muted-foreground">({formatWeekday(nextCleaning.date)})</span>
+              <span className="ml-1 self-center rounded-sm bg-accent px-1.5 py-0.5 text-xs font-semibold tracking-normal text-accent-foreground">
                 {relativeDayLabel(diffDays(nextCleaning.date, data.today))}
               </span>
             </Figure>
           ) : (
-            <Figure>예정 없음</Figure>
+            <Figure size="md">예정 없음</Figure>
           )}
         </KpiCard>
-      </section>
+      </KpiSection>
 
-      <section aria-label="운영 지표" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <KpiSection id="kpi-operations" title="운영 지표">
         <KpiCard
-          icon={Gauge}
-          tone="violet"
           label="가동률"
           footer={
             <p>
@@ -123,18 +95,11 @@ export function KpiGrid({ data }: { data: DashboardData }) {
           <Figure size="md">{current.occupancy === null ? "—" : formatPercent(current.occupancy)}</Figure>
         </KpiCard>
 
-        <KpiCard
-          icon={BedDouble}
-          tone="teal"
-          label="평균 객단가 (ADR)"
-          footer={<Delta diff={diffOrNull(current.adr, previous.adr)} kind="krw" />}
-        >
+        <KpiCard label="평균 객단가 (ADR)" footer={<Delta diff={diffOrNull(current.adr, previous.adr)} kind="krw" />}>
           {current.adr === null ? <Figure size="md">—</Figure> : <Amount value={current.adr} size="md" />}
         </KpiCard>
 
         <KpiCard
-          icon={MessageSquareText}
-          tone="rose"
           label="답변 대기"
           footer={
             pendingReplies === 0
@@ -143,39 +108,42 @@ export function KpiGrid({ data }: { data: DashboardData }) {
           }
         >
           <Figure size="md" unit="건">
-            {pendingReplies}
+            <span className={cn(pendingReplies > 0 && "text-warning")}>{pendingReplies}</span>
           </Figure>
         </KpiCard>
 
         <KpiCard
-          icon={Zap}
-          tone="orange"
           label="오늘의 자동화"
           footer={`요금 변경 ${data.automation.priceChangesToday}건 · 메시지 발송 ${data.automation.messagesSentToday}건`}
         >
           {data.automation.lastminute.length === 0 ? (
             <p className="text-[15px] font-semibold">당일 인하 꺼짐</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="space-y-2.5">
               {data.automation.lastminute.map(({ unitId, unitNickname, state }) => {
                 const { status, detail, live } = describeLastminute(state);
                 return (
-                  <li key={unitId}>
+                  <li key={unitId} className="min-w-0">
                     <p className="flex flex-wrap items-center gap-x-2 text-[15px] font-semibold">
-                      {unitNickname} 당일 인하
-                      <span className={cn("inline-flex items-center gap-1.5", live ? "text-primary" : "text-muted-foreground")}>
-                        {live && <span className="size-1.5 animate-pulse rounded-full bg-primary" aria-hidden />}
+                      <span className="wrap-break-word">{unitNickname} 당일 인하</span>
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 text-sm",
+                          live ? "text-primary" : "font-medium text-muted-foreground",
+                        )}
+                      >
+                        {live && <span className="size-1.5 rounded-full bg-primary motion-safe:animate-pulse" aria-hidden />}
                         {status}
                       </span>
                     </p>
-                    <p className="text-sm text-muted-foreground tabular-nums">{detail}</p>
+                    <p className="text-[13px] text-muted-foreground tabular-nums">{detail}</p>
                   </li>
                 );
               })}
             </ul>
           )}
         </KpiCard>
-      </section>
+      </KpiSection>
     </>
   );
 }

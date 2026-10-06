@@ -11,6 +11,9 @@ import { useDashboardLive } from "./dashboard-live";
 
 const ALL_UNITS = "all";
 
+const SEGMENT =
+  "h-7 rounded-md px-3 text-muted-foreground hover:bg-transparent hover:text-foreground data-[state=on]:bg-card data-[state=on]:font-semibold data-[state=on]:text-foreground data-[state=on]:shadow-xs";
+
 export function DashboardToolbar({
   query,
   units,
@@ -28,23 +31,31 @@ export function DashboardToolbar({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="flex items-center gap-2.5">
-        <h2 className="text-lg font-semibold">이번 달</h2>
-        <span className="text-[15px] text-muted-foreground">{monthLabel}</span>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+        <h2 className="text-lg font-semibold tracking-tight">
+          이번 달 <span className="ml-1 font-normal text-muted-foreground tabular-nums">{monthLabel}</span>
+        </h2>
         {source === "mock" && (
           <Tooltip>
             <TooltipTrigger asChild>
-              <span
-                tabIndex={0}
-                className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-200 ring-inset"
+              <button
+                type="button"
+                className="cursor-help rounded-sm border border-warning/30 bg-warning-soft px-2 py-0.5 text-xs font-semibold text-warning transition-colors hover:border-warning/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 데모 데이터
-              </span>
+              </button>
             </TooltipTrigger>
             <TooltipContent>에어비앤비 연동 전까지 샘플 데이터로 표시합니다</TooltipContent>
           </Tooltip>
         )}
-        {navigating && <Loader2 className="size-4 animate-spin text-muted-foreground" aria-label="불러오는 중" />}
+        <span role="status" className="inline-flex">
+          {navigating && (
+            <>
+              <Loader2 className="size-4 text-muted-foreground motion-safe:animate-spin" aria-hidden />
+              <span className="sr-only">불러오는 중…</span>
+            </>
+          )}
+        </span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -52,7 +63,7 @@ export function DashboardToolbar({
           value={query.unitId ?? ALL_UNITS}
           onValueChange={(value) => navigate({ ...query, unitId: value === ALL_UNITS ? null : value })}
         >
-          <SelectTrigger aria-label="숙소" className="h-9 min-w-32 rounded-xl bg-card">
+          <SelectTrigger aria-label="숙소" className="h-9 min-w-36 rounded-lg bg-card data-[size=default]:h-9">
             <SelectValue>{selectedLabel}</SelectValue>
           </SelectTrigger>
           <SelectContent>
@@ -67,17 +78,16 @@ export function DashboardToolbar({
 
         <ToggleGroup
           type="single"
-          variant="outline"
-          spacing={0}
+          spacing={1}
           aria-label="매출 기준"
           value={query.basis}
           onValueChange={(value) => value && navigate({ ...query, basis: value as RevenueBasis })}
-          className="rounded-xl bg-card"
+          className="rounded-lg bg-muted p-1 ring-1 ring-border ring-inset"
         >
-          <ToggleGroupItem value="payout" className="h-9 px-3 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground">
+          <ToggleGroupItem value="payout" className={SEGMENT}>
             정산일 기준
           </ToggleGroupItem>
-          <ToggleGroupItem value="stay" className="h-9 px-3 data-[state=on]:bg-accent data-[state=on]:text-accent-foreground">
+          <ToggleGroupItem value="stay" className={SEGMENT}>
             숙박일 기준
           </ToggleGroupItem>
         </ToggleGroup>

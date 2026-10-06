@@ -111,7 +111,7 @@ export function DashboardLiveProvider({
 export function PendingRegion({ children }: { children: ReactNode }) {
   const { navigating } = useDashboardLive();
   return (
-    <div aria-busy={navigating} className="space-y-4 transition-opacity data-[busy=true]:opacity-50" data-busy={navigating}>
+    <div aria-busy={navigating} className="space-y-6 transition-opacity data-[busy=true]:opacity-50" data-busy={navigating}>
       {children}
     </div>
   );

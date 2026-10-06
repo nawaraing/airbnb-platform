@@ -46,7 +46,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
   if (!credentialsMatch(config, username, password)) {
     limiter.fail(key);
     await sleep(FAILURE_DELAY_MS);
-    return { error: "아이디 또는 비밀번호가 올바르지 않습니다.", username };
+    return { error: "아이디 또는 비밀번호가 올바르지 않습니다. 다시 확인해 주세요.", username };
   }
 
   limiter.reset(key);

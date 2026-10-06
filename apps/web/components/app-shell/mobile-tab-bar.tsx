@@ -23,7 +23,7 @@ export function MobileTabBar() {
               <span>{item.shortLabel}</span>
             </>
           );
-          const base = "flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium";
+          const base = "relative flex h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium";
 
           return (
             <li key={item.href}>
@@ -31,12 +31,18 @@ export function MobileTabBar() {
                 <Link
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={cn(base, active ? "text-primary" : "text-muted-foreground")}
+                  className={cn(
+                    base,
+                    "transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset",
+                    active
+                      ? "font-semibold text-primary before:absolute before:top-0 before:left-1/2 before:h-0.5 before:w-8 before:-translate-x-1/2 before:rounded-b-full before:bg-primary"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
                 >
                   {content}
                 </Link>
               ) : (
-                <span aria-disabled="true" title="준비 중" className={cn(base, "text-muted-foreground/40")}>
+                <span aria-disabled="true" title="준비 중" className={cn(base, "text-muted-foreground/45")}>
                   {content}
                 </span>
               )}
