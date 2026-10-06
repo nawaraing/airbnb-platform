@@ -5,3 +5,4 @@ coverage/
 .env*
 .claude/settings.local.json
 !.env.example
+.airbnb-session/

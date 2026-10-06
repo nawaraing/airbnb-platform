@@ -3,13 +3,17 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "packages/connectors/*"
   ],
   "scripts": {
     "dev": "npm run dev -w web",
     "build": "npm run build -w web",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present",
+    "airbnb:login": "npm run login -w @repo/connector-airbnb",
+    "airbnb:probe": "npm run probe -w @repo/connector-airbnb --",
+    "airbnb:price-check": "npm run price-check -w @repo/connector-airbnb --"
   }
 }
